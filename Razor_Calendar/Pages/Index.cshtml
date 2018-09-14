@@ -1,0 +1,110 @@
+﻿@page
+@model Razor_Calendar.Pages.IndexModel
+@{
+}
+<style>
+    .box {
+        height: 50px;
+        width: 50px;
+        float: left;
+    }
+
+    .boxborder {
+        border: 1px solid black;
+    }
+
+    .box_short {
+        width: 50px;
+        float: left;
+    }
+
+    .occupied {
+        background-color: lightgreen;
+    }
+</style>
+
+
+<form method="post" class="form" role="form">
+    <h3>@Model.currentMonth - @Model.current.Year</h3>
+
+    <button type="submit" asp-page-handler="NextMonth" asp-route-direction="0" asp-route-curr="@Model.current" style=""><</button>
+    <button type="submit" asp-page-handler="NextMonth" asp-route-direction="1" asp-route-curr="@Model.current" style="">></button>
+    <br />
+    @for (int i = 0; i < 7; i++)
+    {
+        <div class="box_short" style="text-align:center">
+            @Model.dayNames[i]
+
+        </div>
+    }
+
+    <div style="clear:both;"></div>
+
+    @*Example of a lot of procesing done in display... vs handling it in the back end and let hte display just display.
+        @{
+            int b = 0;
+            bool end = false;
+        }
+
+        @for (int i = 0; i < 6; i++)
+        {
+            <br />
+            <div style="clear:both;"></div>
+            for (int z = 0; z < 7 && !end; z++)
+            {
+                <div class="box boxborder">
+                    @{
+                        if (b > 0 || z == Model.startingDay)
+                        {
+                            b += 1;
+                        }
+
+                        if (b > Model.daysInMonth)
+                        {
+                            end = true;
+
+                           @:</div>
+                            break;
+                        }
+
+                        if (b > 0)
+                        {
+                            <span>@b</span>
+                        }
+                    }
+
+                </div>
+            }
+        }*@
+
+    @*A whole mess less, and this separates the dispaly from the business logic.*@
+    <div>
+        @for (int i = 0; i < 6; i++)
+        {
+            <br />
+            <div style="clear:both;"></div>
+            for (int z = 0; z < 7; z++)
+            {
+                <div class="box boxborder @(Model.dayCollection[i, z] != null && Model.dayCollection[i, z].isOccupied ? " occupied" : "")">
+
+                    @if (Model.dayCollection[i, z] != null)
+                    {
+                        <span>@Model.dayCollection[i, z].GetNumber()</span>
+
+                        if (Model.dayCollection[i, z].isOccupied)
+                        {
+                            <br /><span>O</span>
+                        }
+
+                    }
+                    else
+                    {
+                        <span>&nbsp;</span>
+                    }
+
+                </div>
+            }
+        }
+    </div>
+</form>
+<div style="clear:both;"></div>
